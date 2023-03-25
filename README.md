@@ -2,6 +2,8 @@ welcome to expressJS
 
 npm install
 
+#run on environtment dev
+npm run start-dev
 
 #for run migrate
 npm install --save-dev sequelize-cli 
