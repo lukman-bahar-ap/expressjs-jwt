@@ -10,10 +10,10 @@ router.post('/', menuController.createMenu);
 router.put('/:id', menuController.updateMenu);
 router.delete('/:id', menuController.deleteMenu);
 
-router.get('permission/', menuPermissionController.getAllMenuPermissions);
-router.get('permission/:id', menuPermissionController.getMenuPermissionById);
-router.post('permission/', menuPermissionController.createMenuPermission);
-router.put('permission/:id', menuPermissionController.updateMenuPermission);
-router.delete('permission/:id', menuPermissionController.deleteMenuPermission);
+router.get('/:menuId/permission/', menuPermissionController.getAllMenuPermissions);
+router.get('/:menuId/permission/:id', menuPermissionController.getMenuPermission);
+router.post('/:menuId/permission/', menuPermissionController.createMenuPermission);
+router.put('/:menuId/permission/:id', menuPermissionController.updateMenuPermission);
+router.delete('/:menuId/permission/:id', menuPermissionController.deleteMenuPermission);
 
 module.exports = router;

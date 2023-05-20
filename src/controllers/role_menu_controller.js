@@ -5,12 +5,24 @@ const {
   getRoleMenuById,
   updateRoleMenu,
   deleteRoleMenu,
+  showRoleMenus,
 } = require('../services/role_menu_service');
 
 class RoleMenuController {
   static async getAllRoleMenus(req, res) {
     try {
       const roleMenus = await getRoleMenus();
+      res.json(roleMenus);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
+  }
+
+  static async getMenuByRoles(req, res) {
+    const { id } = req.params;
+    try {
+      const roleMenus = await showRoleMenus(id);
       res.json(roleMenus);
     } catch (error) {
       console.error(error);

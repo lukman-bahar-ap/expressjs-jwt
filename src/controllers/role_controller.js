@@ -4,6 +4,7 @@ const {
   getRoleById,
   updateRole,
   deleteRole,
+  showGrantAccessRoles,
 } = require('../services/role_service');
 
 class RoleController {
@@ -21,6 +22,21 @@ class RoleController {
     const { id } = req.params;
     try {
       const role = await getRoleById(id);
+      if (role) {
+        res.json(role);
+      } else {
+        res.sendStatus(404);
+      }
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
+  }
+
+  static async getGrantRoleById(req, res) {
+    const { id } = req.params;
+    try {
+      const role = await showGrantAccessRoles(id);
       if (role) {
         res.json(role);
       } else {

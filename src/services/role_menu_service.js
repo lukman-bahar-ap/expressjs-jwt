@@ -1,28 +1,36 @@
 /* eslint-disable camelcase */
 const RoleMenu = require('../models/role_menu');
+const Menu = require('../models/menu');
 
-async function createRoleMenu(roleMenu) {
-  return RoleMenu.create(roleMenu);
-}
+const createRoleMenu = async (roleMenu) => RoleMenu.create(roleMenu);
 
-async function getRoleMenus() {
-  return RoleMenu.findAll();
-}
+const getRoleMenus = async () => RoleMenu.findAll();
 
-async function getRoleMenuById(id) {
-  return RoleMenu.findByPk(id);
-}
+const getRoleMenuById = async (id) => RoleMenu.findByPk(id);
 
-async function updateRoleMenu(id, roleMenu) {
+const showRoleMenus = async (id) => {
+  // RoleMenu.belongsTo(Menu, { foreignKey: 'menu_id' });
+  const query = await RoleMenu.findAll({
+    where: { role_id: id },
+    include: [
+      {
+        model: Menu,
+      },
+    ],
+  });
+  return query;
+};
+
+const updateRoleMenu = async (id, roleMenu) => {
   const { role_id, menu_id } = roleMenu;
   const updatedRoleMenu = await RoleMenu.update({ role_id, menu_id }, { where: { id } });
   return updatedRoleMenu[0] === 1;
-}
+};
 
-async function deleteRoleMenu(id) {
+const deleteRoleMenu = async (id) => {
   const deletedRoleMenu = await RoleMenu.destroy({ where: { id } });
   return deletedRoleMenu === 1;
-}
+};
 
 module.exports = {
   createRoleMenu,
@@ -30,4 +38,5 @@ module.exports = {
   getRoleMenuById,
   updateRoleMenu,
   deleteRoleMenu,
+  showRoleMenus,
 };

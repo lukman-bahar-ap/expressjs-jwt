@@ -7,10 +7,10 @@ const Menu = require('./menu');
 class RoleMenu extends Model {
   static associate() {
     // define association here
-    RoleMenu.belongsTo(Role, { as: 'Role', foreignKey: 'role_id' });
+    RoleMenu.belongsTo(Role, { foreignKey: 'role_id' });
     Role.hasMany(RoleMenu);
 
-    RoleMenu.belongsTo(Menu, { as: 'Menu', foreignKey: 'menu_id' });
+    RoleMenu.belongsTo(Menu, { foreignKey: 'menu_id' });
     Menu.hasMany(RoleMenu);
   }
 }

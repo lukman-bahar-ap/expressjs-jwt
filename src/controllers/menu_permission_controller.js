@@ -1,16 +1,17 @@
 /* eslint-disable camelcase */
 const {
   createMenuPermission,
-  getMenuPermissionById,
+  findMenuPermissionByMenuAndId,
   updateMenuPermission,
   deleteMenuPermission,
   findMenuPermissionByMenu,
+  findAllMenuPermissions,
 } = require('../services/menu_permission_service');
 
 class MenuPermissionController {
   static async getAllMenuPermissions(req, res) {
     try {
-      const menuPermissions = await getMenuPermissions();
+      const menuPermissions = await findAllMenuPermissions();
       res.json(menuPermissions);
     } catch (error) {
       console.error(error);
@@ -25,6 +26,7 @@ class MenuPermissionController {
       if (menuPermission) {
         res.json(menuPermission);
       } else {
+        console.log('else');
         res.sendStatus(404);
       }
     } catch (error) {
@@ -33,10 +35,10 @@ class MenuPermissionController {
     }
   }
 
-  static async getMenuPermissionById(req, res) {
-    const { id } = req.params;
+  static async getMenuPermission(req, res) {
+    const { menuId, id } = req.params;
     try {
-      const menuPermission = await getMenuPermissionById(id);
+      const menuPermission = await findMenuPermissionByMenuAndId(menuId, id);
       if (menuPermission) {
         res.json(menuPermission);
       } else {

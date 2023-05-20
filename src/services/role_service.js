@@ -1,27 +1,42 @@
 const Role = require('../models/role');
+const RoleMenu = require('../models/role_menu');
+const RoleMenuPermission = require('../models/role_menu_permission');
+const Menu = require('../models/menu');
+const MenuPermission = require('../models/menu_permission');
 
-async function createRole(role) {
-  return Role.create(role);
-}
+const createRole = async (role) => Role.create(role);
 
-async function getRoles() {
-  return Role.findAll();
-}
+const getRoles = async () => Role.findAll();
 
-async function getRoleById(id) {
-  return Role.findByPk(id);
-}
+const getRoleById = async (id) => Role.findByPk(id);
 
-async function updateRole(id, role) {
+const updateRole = async (id, role) => {
   const { name } = role;
   const updatedRole = await Role.update({ name }, { where: { id } });
   return updatedRole[0] === 1;
-}
+};
 
-async function deleteRole(id) {
+const deleteRole = async (id) => {
   const deletedRole = await Role.destroy({ where: { id } });
   return deletedRole === 1;
-}
+};
+
+const showGrantAccessRoles = async (id) => {
+  const query = await RoleMenu.findAll({
+    where: { role_id: id },
+    include: [
+      {
+        model: Menu,
+      }, {
+        model: RoleMenuPermission,
+        include: [{
+          model: MenuPermission,
+        }],
+      },
+    ],
+  });
+  return query;
+};
 
 module.exports = {
   createRole,
@@ -29,4 +44,5 @@ module.exports = {
   getRoleById,
   updateRole,
   deleteRole,
+  showGrantAccessRoles,
 };

@@ -2,7 +2,7 @@
 const bcrypt = require('bcrypt');
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../../config/db');
-const { Role } = require('./role');
+const Role = require('./role');
 
 class User extends Model {
   /**

@@ -10,7 +10,11 @@ async function findAllMenuPermissions() {
 }
 
 async function findMenuPermissionByMenu(id) {
-  return MenuPermission.findOne({ where: { menu_id: id } });
+  return MenuPermission.findAll({ where: { menu_id: id } });
+}
+
+async function findMenuPermissionByMenuAndId(menuId, id) {
+  return MenuPermission.findOne({ where: { id, menu_id: menuId } });
 }
 
 async function getMenuPermissionById(id) {
@@ -35,4 +39,5 @@ module.exports = {
   getMenuPermissionById,
   updateMenuPermission,
   deleteMenuPermission,
+  findMenuPermissionByMenuAndId,
 };

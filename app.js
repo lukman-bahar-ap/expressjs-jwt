@@ -4,10 +4,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 // impor routes
+const { initRelationForApp } = require('./src/models/associate_init');
 const authRoutes = require('./src/routes/auth_routes');
 const userRoutes = require('./src/routes/user_routes');
 const menuRoutes = require('./src/routes/menu_routes');
-const menuPermissionRoutes = require('./src/routes/menu_permission_routes');
 const roleRoutes = require('./src/routes/role_routes');
 const roleMenuRoutes = require('./src/routes/role_menu_routes');
 const roleMenuPermissionRoutes = require('./src/routes/role_menu_permission_routes');
@@ -23,11 +23,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(middleware.logRequest);
 
+initRelationForApp().then(console.log('model relation has been initiated'));
+
 // Add routes
 app.use('/auth', authRoutes);
 app.use('/users', auth, userRoutes);
 app.use('/menus', auth, menuRoutes);
-app.use('/menu-permissions', auth, menuPermissionRoutes);
 app.use('/roles', auth, roleRoutes);
 app.use('/role-menus', auth, roleMenuRoutes);
 app.use('/role-menu-permissons', auth, roleMenuPermissionRoutes);
