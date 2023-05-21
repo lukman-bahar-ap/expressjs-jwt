@@ -1,41 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const { User } = require('../models/user');
-
-passport.use(new LocalStrategy({
-  usernameField: 'email',
-  passwordField: 'password',
-}, (email, password, done) => {
-  User.findOne({ where: { email } })
-    .then((user) => {
-      if (!user) {
-        return done(null, false, { message: 'Incorrect email or password.' });
-      }
-
-      bcrypt.compare(password, user.password)
-        .then((result) => {
-          if (result) {
-            return done(null, user);
-          }
-          return done(null, false, { message: 'Incorrect email or password.' });
-        });
-
-      return done(null, false, { message: 'something else' });
-    })
-    .catch((err) => done(err));
-}));
-
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser((id, done) => {
-  User.findByPk(id)
-    .then((user) => done(null, user))
-    .catch((err) => done(err));
-});
+const User = require('../models/user');
 
 const createJwtToken = async (user) => {
   try {
@@ -60,7 +25,7 @@ const comparePassword = async (inputPass, user) => {
     // Create token
     try {
       const token = await createJwtToken(user);
-      return token;
+      return { success: true, token };
     } catch (error) {
       console.error(error);
       try {
@@ -73,12 +38,19 @@ const comparePassword = async (inputPass, user) => {
   return false;
 };
 
-const registerUser = async (userData) => {
-  const { username, email, password } = userData;
-  const saltRounds = 10;
-
-  return bcrypt.hash(password, saltRounds)
-    .then((hash) => User.create({ username, email, password: hash }));
+const checkAuth = async (email, password) => {
+  const checkedUser = await User.findOne({ where: { email } });
+  if (checkedUser.email) {
+    // user
+    const createToken = await comparePassword(password, checkedUser);
+    if (createToken.success) {
+      console.log({ status: 200, email: checkedUser.email, token: createToken.token });
+      return { status: 200, email: checkedUser.email, token: createToken.token };
+    }
+    return { status: 400, message: 'Invalid Credentials' };
+  }
+  console.log({ status: 400, message: 'Email unkown, not registered before' });
+  return { status: 400, message: 'Email unkown, not registered before' };
 };
 
 const destroyToken = async (token) => {
@@ -107,5 +79,5 @@ const destroyToken = async (token) => {
 };
 
 module.exports = {
-  registerUser, comparePassword, createJwtToken, destroyToken,
+  comparePassword, createJwtToken, destroyToken, checkAuth,
 };

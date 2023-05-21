@@ -10,9 +10,9 @@ module.exports = {
      * Add altering commands here.
      *
      * Example:
-     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
+     * await queryInterface.createTable('menus', { id: Sequelize.INTEGER });
      */
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('menus', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -22,13 +22,8 @@ module.exports = {
         type: Sequelize.STRING(50),
         allowNull: false,
       },
-      email: {
+      path: {
         type: Sequelize.STRING(50),
-        allowNull: false,
-        unique: true,
-      },
-      password: {
-        type: Sequelize.STRING,
         allowNull: false,
       },
       created_at: {
@@ -49,8 +44,8 @@ module.exports = {
      * Add reverting commands here.
      *
      * Example:
-     * await queryInterface.dropTable('users');
+     * await queryInterface.dropTable('menus');
      */
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable('menus');
   },
 };

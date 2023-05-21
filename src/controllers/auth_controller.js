@@ -1,5 +1,5 @@
-const { createUser, getUserByEmail } = require('../services/user_service');
-const { comparePassword, createJwtToken, destroyToken } = require('../services/auth_service');
+const { createUser } = require('../services/user_service');
+const { createJwtToken, destroyToken, checkAuth } = require('../services/auth_service');
 
 class AuthController {
   static async login(req, res) {
@@ -12,16 +12,12 @@ class AuthController {
         return res.status(400).send('All input is required');
       }
 
-      const checkedUser = await getUserByEmail(email);
-      if (checkedUser.email) {
-        // user
-        const token = await comparePassword(password, checkedUser);
-        if (token) {
-          return res.status(200).json({ email: checkedUser.email, token });
-        }
-        return res.status(400).send('Invalid Credentials');
+      const checkedUser = await checkAuth(email, password);
+      if (checkedUser.status === 200) {
+        return res.status(200).send(checkedUser);
       }
-      return res.status(400).send('Email unkown, not registered before');
+
+      return res.status(400).send(checkedUser.message);
     } catch (err) {
       console.log(err);
       return res.status(500).send('some error');

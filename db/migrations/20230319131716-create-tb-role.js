@@ -10,25 +10,16 @@ module.exports = {
      * Add altering commands here.
      *
      * Example:
-     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
+     * await queryInterface.createTable('roles', { id: Sequelize.INTEGER });
      */
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('roles', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
       name: {
-        type: Sequelize.STRING(50),
-        allowNull: false,
-      },
-      email: {
-        type: Sequelize.STRING(50),
-        allowNull: false,
-        unique: true,
-      },
-      password: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(25),
         allowNull: false,
       },
       created_at: {
@@ -49,8 +40,8 @@ module.exports = {
      * Add reverting commands here.
      *
      * Example:
-     * await queryInterface.dropTable('users');
+     * await queryInterface.dropTable('roles');
      */
-    await queryInterface.dropTable('users');
+    await queryInterface.dropTable('roles');
   },
 };
