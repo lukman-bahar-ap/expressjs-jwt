@@ -1,0 +1,12 @@
+FROM node:14
+
+LABEL version="1.0"
+LABEL maintainer="lukman.bahar.ap@gmail.com"
+
+WORKDIR /home/app/
+COPY . .
+
+RUN "npm install"
+CMD ["npm","run","start-prod"]
+
+EXPOSE 8080 8443 3000

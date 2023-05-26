@@ -6,7 +6,8 @@
     "start": "node bin/www",
     "lint": "eslint",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start-dev": "npx nodemon app.js"
+    "start-dev": "npx nodemon app.js",
+    "start-prod": "node app.js"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
