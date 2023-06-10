@@ -3,13 +3,16 @@
 
 'use strict';
 
-const bcrypt = require('bcrypt');
+const argon2 = require('argon2');
 
-const hashpass = async (pass) => bcrypt.hash(pass, 10)
-  .then((hash) => hash)
-  .catch(() => {
+const hashpass = async (pass) => {
+  try {
+    const hash = await argon2.hash(pass);
+    return hash;
+  } catch (err) {
     throw new Error();
-  });
+  }
+};
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {

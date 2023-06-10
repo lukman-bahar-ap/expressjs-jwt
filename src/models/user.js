@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-const bcrypt = require('bcrypt');
+const argon2 = require('argon2');
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../../config/db');
 const Role = require('./role');
@@ -55,14 +55,24 @@ User.init({
 });
 
 // Hash passwords before saving
-User.beforeCreate((user) => bcrypt.hash(user.password, 10)
-  .then((hash) => {
+User.beforeCreate(async (user) => {
+  try {
+    const hash = await argon2.hash(user.password);
     user.password = hash;
-  })
-  .catch(() => {
+  } catch (err) {
     throw new Error();
-  }));
+  }
+});
 
-User.prototype.isValidPassword = async (password) => bcrypt.compare(password, this.password);
+User.prototype.isValidPassword = async (password) => {
+  try {
+    if (await argon2.verify(password, this.password)) {
+      return true;
+    }
+    return false;
+  } catch (err) {
+    throw new Error();
+  }
+};
 
 module.exports = User;

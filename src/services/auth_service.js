@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
@@ -21,7 +21,7 @@ const createJwtToken = async (user) => {
 const comparePassword = async (inputPass, user) => {
   // Validate if user exist in our database
   console.log(`${inputPass} => ${user.password} token => ${process.env.JWT_SECRET_KEY}`);
-  if (await bcrypt.compare(inputPass, user.password)) {
+  if (await argon2.verify(user.password, inputPass)) {
     // Create token
     try {
       const token = await createJwtToken(user);
@@ -39,18 +39,20 @@ const comparePassword = async (inputPass, user) => {
 };
 
 const checkAuth = async (email, password) => {
-  const checkedUser = await User.findOne({ where: { email } });
-  if (checkedUser.email) {
-    // user
-    const createToken = await comparePassword(password, checkedUser);
-    if (createToken.success) {
-      console.log({ status: 200, email: checkedUser.email, token: createToken.token });
-      return { status: 200, email: checkedUser.email, token: createToken.token };
-    }
-    return { status: 400, message: 'Invalid Credentials' };
+  const checkedUser = await User.findOne({ where: { email: 'admin@admin.com' } });
+
+  if (checkedUser == null) {
+    console.log({ status: 400, message: `Email ${email} unkown, not registered before` });
+    return { status: 400, message: `Email ${email} unkown, not registered before` };
   }
-  console.log({ status: 400, message: 'Email unkown, not registered before' });
-  return { status: 400, message: 'Email unkown, not registered before' };
+  // user
+  const createToken = await comparePassword(password, checkedUser);
+  console.log(createToken);
+  if (createToken.success) {
+    console.log({ status: 200, email: checkedUser.email, token: createToken.token });
+    return { status: 200, email: checkedUser.email, token: createToken.token };
+  }
+  return { status: 400, message: 'Invalid Credentials' };
 };
 
 const destroyToken = async (token) => {

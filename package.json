@@ -6,10 +6,11 @@
     "start": "node bin/www",
     "lint": "eslint",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start-dev": "npx nodemon app.js"
+    "start-dev": "npx nodemon app.js",
+    "start-prod": "node app.js"
   },
   "dependencies": {
-    "bcrypt": "^5.0.1",
+    "argon2": "^0.30.3",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
