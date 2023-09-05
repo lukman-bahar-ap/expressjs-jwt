@@ -12,8 +12,8 @@ class User extends Model {
      */
   static associate() {
     // define association here
-    User.belongsTo(Role, { as: 'Role', foreignKey: 'role_id' });
-    Role.hasMany(User);
+    // User.belongsTo(Role, { as: 'Role', foreignKey: 'role_id' });
+    // Role.hasMany(User);
   }
 }
 

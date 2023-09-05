@@ -7,11 +7,11 @@ const MenuPermission = require('./menu_permission');
 class RoleMenuPermission extends Model {
   static associate() {
     // define association here
-    RoleMenuPermission.belongsTo(RoleMenu, { as: 'RoleMenu', foreignKey: 'role_menu_id' });
-    RoleMenu.hasMany(RoleMenuPermission);
+    // RoleMenuPermission.belongsTo(RoleMenu, {  foreignKey: 'role_menu_id' });
+    // RoleMenu.hasMany(RoleMenuPermission);
 
-    RoleMenuPermission.belongsTo(MenuPermission, { as: 'Menu', foreignKey: 'menu_permission_id' });
-    MenuPermission.hasMany(RoleMenuPermission);
+    // RoleMenuPermission.belongsTo(MenuPermission, {  foreignKey: 'menu_permission_id' });
+    // MenuPermission.hasMany(RoleMenuPermission);
   }
 }
 

@@ -39,7 +39,7 @@ const comparePassword = async (inputPass, user) => {
 };
 
 const checkAuth = async (email, password) => {
-  const checkedUser = await User.findOne({ where: { email: 'admin@admin.com' } });
+  const checkedUser = await User.findOne({ where: { email } });
 
   if (checkedUser == null) {
     console.log({ status: 400, message: `Email ${email} unkown, not registered before` });

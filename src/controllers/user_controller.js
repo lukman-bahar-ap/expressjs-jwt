@@ -4,12 +4,23 @@ const {
   getUserById,
   updateUser,
   deleteUser,
+  showUsers,
 } = require('../services/user_service');
 
 class UserController {
   static async getAllUsers(req, res) {
     try {
       const users = await getUsers();
+      res.json(users);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500);
+    }
+  }
+
+  static async getAllUsersWithRole(req, res) {
+    try {
+      const users = await showUsers();
       res.json(users);
     } catch (error) {
       console.error(error);

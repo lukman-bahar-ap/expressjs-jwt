@@ -1,36 +1,28 @@
 /* eslint-disable camelcase */
 const MenuPermission = require('../models/menu_permission');
 
-async function createMenuPermission(menuPermission) {
-  return MenuPermission.create(menuPermission);
-}
+const createMenuPermission = async (data) => MenuPermission.create(data);
 
-async function findAllMenuPermissions() {
-  return MenuPermission.findAll();
-}
+const findAllMenuPermissions = async () => MenuPermission.findAll();
 
-async function findMenuPermissionByMenu(id) {
-  return MenuPermission.findAll({ where: { menu_id: id } });
-}
+const findMenuPermissionByMenu = async (id) => MenuPermission.findAll({ where: { menu_id: id } });
 
-async function findMenuPermissionByMenuAndId(menuId, id) {
-  return MenuPermission.findOne({ where: { id, menu_id: menuId } });
-}
+const findMenuPermissionByMenuAndId = async (menu_id, id) => {
+  MenuPermission.findOne({ where: { id, menu_id } });
+};
 
-async function getMenuPermissionById(id) {
-  return MenuPermission.findByPk(id);
-}
+const getMenuPermissionById = async (id) => MenuPermission.findByPk(id);
 
-async function updateMenuPermission(id, menuPermission) {
-  const { name, menu_id } = menuPermission;
+const updateMenuPermission = async (id, data) => {
+  const { name, menu_id } = data;
   const updateFromModel = await MenuPermission.update({ name, menu_id }, { where: { id } });
   return updateFromModel[0] === 1;
-}
+};
 
-async function deleteMenuPermission(id) {
+const deleteMenuPermission = async (id) => {
   const deleteFromModel = await MenuPermission.destroy({ where: { id } });
   return deleteFromModel === 1;
-}
+};
 
 module.exports = {
   findMenuPermissionByMenu,

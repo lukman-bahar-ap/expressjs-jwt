@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Role = require('../models/role');
 
 const createUser = async (data) => User.create(data);
 
@@ -21,6 +22,29 @@ const deleteUser = async (id) => {
   return deletedUser === 1;
 };
 
+const showUsersById = async (id) => {
+  const query = await User.findOne({
+    where: { id },
+    include: [
+      {
+        model: Role,
+      },
+    ],
+  });
+  return query;
+};
+
+const showUsers = async () => {
+  const query = await User.findAll({
+    include: [
+      {
+        model: Role,
+      },
+    ],
+  });
+  return query;
+};
+
 module.exports = {
   createUser,
   getUsers,
@@ -28,4 +52,6 @@ module.exports = {
   updateUser,
   deleteUser,
   getUserByEmail,
+  showUsers,
+  showUsersById,
 };

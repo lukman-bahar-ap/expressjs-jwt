@@ -22,7 +22,7 @@ const initRelationForApp = async () => {
   MenuPermission.belongsTo(Menu, { foreignKey: 'menu_id' });
   Menu.hasMany(MenuPermission);
 
-  User.belongsTo(Role, { as: 'Role', foreignKey: 'role_id' });
+  User.belongsTo(Role, { foreignKey: 'role_id' });
   Role.hasMany(User);
 };
 
