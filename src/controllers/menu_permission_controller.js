@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+const JSONResponse = require('./libs/json_response');
 const {
   createMenuPermission,
   findMenuPermissionByMenuAndId,
@@ -12,10 +13,9 @@ class MenuPermissionController {
   static async getAllMenuPermissions(req, res) {
     try {
       const menuPermissions = await findAllMenuPermissions();
-      res.json(menuPermissions);
+      JSONResponse.success(res, '', menuPermissions);
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -24,14 +24,12 @@ class MenuPermissionController {
     try {
       const menuPermission = await findMenuPermissionByMenu(menuId);
       if (menuPermission) {
-        res.json(menuPermission);
+        JSONResponse.success(res, '', menuPermission);
       } else {
-        console.log('else');
-        res.sendStatus(404);
+        JSONResponse.dataNotFound(res);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -40,13 +38,12 @@ class MenuPermissionController {
     try {
       const menuPermission = await findMenuPermissionByMenuAndId(menuId, id);
       if (menuPermission) {
-        res.json(menuPermission);
+        JSONResponse.success(res, '', menuPermission);
       } else {
-        res.sendStatus(404);
+        JSONResponse.dataNotFound(res);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -56,18 +53,14 @@ class MenuPermissionController {
 
     // Validate menuPermission input
     if (!(name && menu_id)) {
-      return res.status(400).send('All input is required');
+      JSONResponse.inputRequired(res);
     }
 
     try {
       const menuPermissionId = await createMenuPermission(data);
-      return res.status(201).json({ id: menuPermissionId });
+      JSONResponse.createdSuccess(res, '', { id: menuPermissionId });
     } catch (error) {
-      console.error(error);
-      if (error.errors[0].message !== undefined) {
-        return res.status(400).send(error.errors[0].message);
-      }
-      return res.status(500).send(error);
+      JSONResponse.createError(res, error);
     }
   }
 
@@ -77,13 +70,12 @@ class MenuPermissionController {
       const data = req.body;
       const result = await updateMenuPermission(id, data);
       if (result) {
-        res.sendStatus(204);
+        JSONResponse.success(res, 'data has been updated');
       } else {
-        res.sendStatus(404);
+        JSONResponse.dataNotFound(res);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -92,13 +84,12 @@ class MenuPermissionController {
     try {
       const result = await deleteMenuPermission(id);
       if (result) {
-        res.sendStatus(204);
+        JSONResponse.success(res, 'deleted');
       } else {
-        res.sendStatus(404);
+        JSONResponse.dataNotFound(res);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 }

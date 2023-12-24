@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+const JSONResponse = require('./libs/json_response');
 const {
   createRoleMenu,
   getRoleMenus,
@@ -14,8 +15,7 @@ class RoleMenuController {
       const roleMenus = await getRoleMenus();
       res.json(roleMenus);
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -25,8 +25,7 @@ class RoleMenuController {
       const roleMenus = await showRoleMenus(id);
       res.json(roleMenus);
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -40,8 +39,7 @@ class RoleMenuController {
         res.sendStatus(404);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -50,18 +48,14 @@ class RoleMenuController {
     const { role_id, menu_id } = data;
     // Validate roleMenu input
     if (!(role_id && menu_id)) {
-      return res.status(400).send('All input is required');
+      JSONResponse.inputRequired(res);
     }
 
     try {
       const roleMenuId = await createRoleMenu(data);
-      return res.status(201).json({ id: roleMenuId });
+      JSONResponse.createdSuccess(res, '', { id: roleMenuId });
     } catch (error) {
-      console.error(error);
-      if (error.errors[0].message !== undefined) {
-        return res.status(400).send(error.errors[0].message);
-      }
-      return res.status(500).send(error);
+      JSONResponse.createError(res, error);
     }
   }
 
@@ -71,13 +65,12 @@ class RoleMenuController {
       const data = req.body;
       const result = await updateRoleMenu(id, data);
       if (result) {
-        res.sendStatus(204);
+        JSONResponse.success(res, 'data has been updated');
       } else {
-        res.sendStatus(404);
+        JSONResponse.dataNotFound(res);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -86,13 +79,12 @@ class RoleMenuController {
     try {
       const result = await deleteRoleMenu(id);
       if (result) {
-        res.sendStatus(204);
+        JSONResponse.success(res, 'deleted');
       } else {
-        res.sendStatus(404);
+        JSONResponse.dataNotFound(res);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 }

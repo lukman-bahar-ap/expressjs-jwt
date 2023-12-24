@@ -1,3 +1,4 @@
+const JSONResponse = require('./libs/json_response');
 const {
   createRole,
   getRoles,
@@ -13,8 +14,7 @@ class RoleController {
       const roles = await getRoles();
       res.json(roles);
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -28,8 +28,7 @@ class RoleController {
         res.sendStatus(404);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -43,8 +42,7 @@ class RoleController {
         res.sendStatus(404);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -54,18 +52,14 @@ class RoleController {
 
     // Validate role input
     if (!name) {
-      return res.status(400).send('All input is required');
+      JSONResponse.inputRequired(res);
     }
 
     try {
       const roleId = await createRole(data);
-      return res.status(201).json({ id: roleId });
+      JSONResponse.createdSuccess(res, '', { id: roleId });
     } catch (error) {
-      console.error(error);
-      if (error.errors[0].message !== undefined) {
-        return res.status(400).send(error.errors[0].message);
-      }
-      return res.status(500).send(error);
+      JSONResponse.createError(res, error);
     }
   }
 
@@ -75,13 +69,12 @@ class RoleController {
       const data = req.body;
       const result = await updateRole(id, data);
       if (result) {
-        res.sendStatus(204);
+        JSONResponse.success(res, 'data has been updated');
       } else {
-        res.sendStatus(404);
+        JSONResponse.dataNotFound(res);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -90,13 +83,12 @@ class RoleController {
     try {
       const result = await deleteRole(id);
       if (result) {
-        res.sendStatus(204);
+        JSONResponse.success(res, 'deleted');
       } else {
-        res.sendStatus(404);
+        JSONResponse.dataNotFound(res);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 }

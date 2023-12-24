@@ -1,3 +1,4 @@
+const JSONResponse = require('./libs/json_response');
 const {
   createMenu,
   getMenus,
@@ -10,10 +11,9 @@ class MenuController {
   static async getAllMenus(req, res) {
     try {
       const menus = await getMenus();
-      res.json(menus);
+      JSONResponse.success(res, '', menus);
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -22,13 +22,12 @@ class MenuController {
     try {
       const menu = await getMenuById(id);
       if (menu) {
-        res.json(menu);
+        JSONResponse.success(res, '', menu);
       } else {
-        res.sendStatus(404);
+        JSONResponse.dataNotFound(res);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -38,18 +37,14 @@ class MenuController {
 
     // Validate menu input
     if (!(name && path)) {
-      return res.status(400).send('All input is required');
+      JSONResponse.inputRequired(res);
     }
 
     try {
       const menuId = await createMenu(data);
-      return res.status(201).json({ id: menuId });
+      JSONResponse.createdSuccess(res, '', { id: menuId });
     } catch (error) {
-      console.error(error);
-      if (error.errors[0].message !== undefined) {
-        return res.status(400).send(error.errors[0].message);
-      }
-      return res.status(500).send(error);
+      JSONResponse.createError(res, error);
     }
   }
 
@@ -64,8 +59,7 @@ class MenuController {
         res.sendStatus(404);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -79,8 +73,7 @@ class MenuController {
         res.sendStatus(404);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 }

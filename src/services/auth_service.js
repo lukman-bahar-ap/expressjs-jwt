@@ -2,32 +2,42 @@ const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
+const config = process.env;
+
+const storeUserToken = async (id, token) => {
+  const updateFromModel = await User.update({ token }, { where: { id } });
+  return updateFromModel[0] === 1;
+};
+
 const createJwtToken = async (user) => {
   try {
     const token = jwt.sign(
-      { user_id: user.id, password: user.password },
+      {
+        user_id: user.id,
+        password: user.password,
+      },
       process.env.JWT_SECRET_KEY,
       {
-        expiresIn: '2h',
+        expiresIn: '12h',
       },
     );
+    const saveToken = storeUserToken(user.id, token);
+    console.log(`x auth token stored = ${saveToken}`);
     return token;
   } catch (error) {
-    console.error(error);
     return error;
   }
 };
 
 const comparePassword = async (inputPass, user) => {
   // Validate if user exist in our database
-  console.log(`${inputPass} => ${user.password} token => ${process.env.JWT_SECRET_KEY}`);
+  // console.log(`${inputPass} => ${user.password} token => ${process.env.JWT_SECRET_KEY}`);
   if (await argon2.verify(user.password, inputPass)) {
     // Create token
     try {
       const token = await createJwtToken(user);
       return { success: true, token };
     } catch (error) {
-      console.error(error);
       try {
         return error.errors[0].message;
       } catch {
@@ -38,48 +48,47 @@ const comparePassword = async (inputPass, user) => {
   return false;
 };
 
-const checkAuth = async (email, password) => {
-  const checkedUser = await User.findOne({ where: { email } });
+const checkLoginAuth = async (email, password) => {
+  const findUser = await User.findOne({ where: { email } });
 
-  if (checkedUser == null) {
-    console.log({ status: 400, message: `Email ${email} unkown, not registered before` });
-    return { status: 400, message: `Email ${email} unkown, not registered before` };
+  if (findUser == null) {
+    return { message: `Email ${email}, not registered` };
   }
   // user
-  const createToken = await comparePassword(password, checkedUser);
-  console.log(createToken);
+  const createToken = await comparePassword(password, findUser);
   if (createToken.success) {
-    console.log({ status: 200, email: checkedUser.email, token: createToken.token });
-    return { status: 200, email: checkedUser.email, token: createToken.token };
+    return {
+      status: 200,
+      data: {
+        email: findUser.email,
+        token: findUser.token,
+      },
+    };
   }
-  return { status: 400, message: 'Invalid Credentials' };
+  return { message: 'Invalid Credentials' };
 };
 
-const destroyToken = async (token) => {
+const destroyToken = async (token, user) => {
+  const { id, password } = user;
   try {
-    // const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    // perform any additional checks on the decoded token if needed
-
-    // if token is valid, add it to a blacklist (for example, in Redis)
-    // or simply invalidate the token on the client-side
-    // depending on your specific use case
-
-    // respond with a success message
-
-    return jwt.sign(token, '', { expiresIn: 1 }, (logout, err) => {
-      blacklist.add(token);
-      if (logout) {
+    const destroySession = () => jwt.sign(token, '', { expiresIn: 1 }, (logoutSuccess, err) => {
+      if (logoutSuccess) {
+        storeUserToken(id, '');
         return true;
       }
-      console.log(err);
-      return false;
+      return err;
     });
+
+    const decoded = jwt.verify(token, config.JWT_SECRET_KEY);
+    if (password === decoded.password) {
+      return destroySession();
+    }
+    return `Invalid Token, ${decoded}`;
   } catch (err) {
-    console.log(err);
-    return false;
+    return err;
   }
 };
 
 module.exports = {
-  comparePassword, createJwtToken, destroyToken, checkAuth,
+  comparePassword, createJwtToken, destroyToken, checkLoginAuth,
 };

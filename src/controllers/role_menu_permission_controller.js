@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+const JSONResponse = require('./libs/json_response');
 const {
   createRoleMenuPermission,
   getRoleMenuPermissions,
@@ -13,8 +14,7 @@ class RoleMenuPermissionController {
       const roleMenuPermissions = await getRoleMenuPermissions();
       res.json(roleMenuPermissions);
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -28,8 +28,7 @@ class RoleMenuPermissionController {
         res.sendStatus(404);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -38,18 +37,14 @@ class RoleMenuPermissionController {
     const { role_menu_id, menu_permission_id } = data;
     // Validate roleMenuPermission input
     if (!(role_menu_id && menu_permission_id)) {
-      return res.status(400).send('All input is required');
+      JSONResponse.inputRequired(res);
     }
 
     try {
       const roleMenuPermissionId = await createRoleMenuPermission(data);
-      return res.status(201).json({ id: roleMenuPermissionId });
+      JSONResponse.createdSuccess(res, '', { id: roleMenuPermissionId });
     } catch (error) {
-      console.error(error);
-      if (error.errors[0].message !== undefined) {
-        return res.status(400).send(error.errors[0].message);
-      }
-      return res.status(500).send(error);
+      JSONResponse.createError(res, error);
     }
   }
 
@@ -59,13 +54,12 @@ class RoleMenuPermissionController {
       const data = req.body;
       const result = await updateRoleMenuPermission(id, data);
       if (result) {
-        res.sendStatus(204);
+        JSONResponse.success(res, 'data has been updated');
       } else {
-        res.sendStatus(404);
+        JSONResponse.dataNotFound(res);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 
@@ -74,13 +68,12 @@ class RoleMenuPermissionController {
     try {
       const result = await deleteRoleMenuPermission(id);
       if (result) {
-        res.sendStatus(204);
+        JSONResponse.success(res, 'deleted');
       } else {
-        res.sendStatus(404);
+        JSONResponse.dataNotFound(res);
       }
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+      JSONResponse.serverError(res, error);
     }
   }
 }

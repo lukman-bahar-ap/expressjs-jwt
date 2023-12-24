@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const helmet = require('helmet');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
@@ -18,8 +19,13 @@ const auth = require('./src/middleware/is_authenticated');
 const app = express();
 
 app.use(cors());
+// for security http header
+app.use(helmet({
+  contentSecurityPolicy: false,
+  xDownloadOptions: false,
+}));
 // Add middleware to handle incoming requests
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(middleware.logRequest);
 
@@ -34,7 +40,7 @@ app.use('/role-menus', auth, roleMenuRoutes);
 app.use('/role-menu-permissons', auth, roleMenuPermissionRoutes);
 
 app.post('/welcome', auth, (req, res) => {
-  res.status(200).send('Welcome 🙌 ');
+  res.status(200).send('Welcome ');
 });
 
 // Start the server

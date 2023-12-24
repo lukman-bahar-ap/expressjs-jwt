@@ -19,13 +19,19 @@ class User extends Model {
 
 User.init({
   id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4, // Or DataTypes.UUIDV1
     primaryKey: true,
     autoIncrement: true,
   },
   name: {
     type: DataTypes.STRING(50),
     allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Please add a name',
+      },
+    },
   },
   email: {
     type: DataTypes.STRING(50),
@@ -35,6 +41,11 @@ User.init({
   password: {
     type: DataTypes.STRING,
     allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'Please add a password',
+      },
+    },
   },
   role_id:
   {
@@ -45,6 +56,10 @@ User.init({
       key: 'id',
     },
     onDelete: 'CASCADE',
+  },
+  token:
+  {
+    type: DataTypes.TEXT,
   },
 }, {
   sequelize,

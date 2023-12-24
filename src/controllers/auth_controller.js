@@ -1,5 +1,6 @@
-const { createUser } = require('../services/user_service');
-const { createJwtToken, destroyToken, checkAuth } = require('../services/auth_service');
+const JSONResponse = require('./libs/json_response');
+const { createUser, getUserById } = require('../services/user_service');
+const { createJwtToken, destroyToken, checkLoginAuth } = require('../services/auth_service');
 
 class AuthController {
   static async login(req, res) {
@@ -9,18 +10,17 @@ class AuthController {
 
       // Validate user input
       if (!(email && password)) {
-        return res.status(400).send('All input is required');
+        JSONResponse.inputRequired(res, req.body);
       }
 
-      const checkedUser = await checkAuth(email, password);
+      const checkedUser = await checkLoginAuth(email, password);
       if (checkedUser.status === 200) {
-        return res.status(200).send(checkedUser);
+        JSONResponse.success(res, '', checkedUser.data);
       }
 
-      return res.status(400).send(checkedUser.message);
+      JSONResponse.unauthorized(res, checkedUser.message);
     } catch (err) {
-      console.log(err);
-      return res.status(500).send('some error');
+      JSONResponse.serverError(res, err);
     }
   }
 
@@ -30,35 +30,37 @@ class AuthController {
 
     // Validate user input
     if (!(email && password && name)) {
-      return res.status(400).send('All input is required');
+      JSONResponse.inputRequired(res, req.body);
     }
 
     try {
       const userId = await createUser(data);
       const token = await createJwtToken(data);
-      return res.status(201).json({ id: userId, token });
+      JSONResponse.createdSuccess(res, '', { id: userId, token });
     } catch (error) {
-      console.error(error);
-      try {
-        return res.status(400).send(error.errors[0].message);
-      } catch {
-        return res.status(500).send(error);
-      }
+      JSONResponse.createError(res, error);
     }
   }
 
   static async logout(req, res) {
     const token = req.headers['x-access-token'];
-    if (!token) return res.status(401).send({ message: 'Unauthorized' });
+    if (!token) JSONResponse.unauthorized(res);
 
     try {
-      const decodedToken = await destroyToken(token);
-      if (decodedToken === true) {
-        return res.status(200).send({ message: 'Logout successful' });
+      const { id } = req.body;
+      const user = await getUserById(id);
+      if (!user) {
+        JSONResponse.unauthorized(res, 'user unkown, not registered before');
       }
-      return res.status(401).send({ message: 'something wrong' });
+
+      const decodedToken = await destroyToken(token, user);
+      if (decodedToken === true) {
+        res.setHeader('Clear-Site-Data', '"cookies"');
+        JSONResponse.success(res, 'Logout successful');
+      }
+      JSONResponse.unauthorized(res, `something wrong, ${decodedToken}`);
     } catch (err) {
-      return res.status(401).send({ message: 'Unauthorized' });
+      JSONResponse.unauthorized(res, err);
     }
   }
 }
